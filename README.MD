@@ -61,4 +61,3 @@ docker compose up -d
 - `GET /api/articles` - 文章列表
 - `GET /api/articles/{id}` - 文章详情
 
-更多信息请查看 [PROJECT_PLAN.md](./PROJECT_PLAN.md)
