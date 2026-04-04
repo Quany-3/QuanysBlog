@@ -82,4 +82,11 @@ public interface ArticleService {
      * @return 文章分页结果
      */
     Page<ArticleResponse> searchArticles(String keyword, Pageable pageable);
+
+    /**
+     * 增加文章浏览量
+     *
+     * @param id 文章ID
+     */
+    void incrementViewCount(Long id);
 }

@@ -187,6 +187,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 增加文章浏览量
+     */
+    @Override
+    @Transactional
+    public void incrementViewCount(Long id) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+        article.setViewCount(article.getViewCount() + 1);
+        articleRepository.save(article);
+    }
+
+    /**
      * 分页查询文章列表
      */
     @Override

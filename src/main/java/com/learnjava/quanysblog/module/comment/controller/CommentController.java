@@ -8,6 +8,9 @@ import com.learnjava.quanysblog.module.user.entity.User;
 import com.learnjava.quanysblog.module.auth.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -81,6 +84,36 @@ public class CommentController {
             Authentication authentication) {
         Long authorId = getCurrentUserId(authentication);
         commentService.deleteComment(id, authorId);
+        return ResponseEntity.ok(ApiResponse.success("评论删除成功"));
+    }
+
+    /**
+     * 获取所有评论（管理员）
+     * GET /api/comments/admin/all
+     *
+     * @param page 页码
+     * @param size 每页数量
+     * @return 评论分页结果
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<ApiResponse<Page<CommentResponse>>> getAllComments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CommentResponse> comments = commentService.getAllComments(pageable);
+        return ResponseEntity.ok(ApiResponse.success(comments));
+    }
+
+    /**
+     * 管理员删除评论
+     * DELETE /api/comments/admin/{id}
+     *
+     * @param id 评论ID
+     * @return 无内容返回
+     */
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteCommentByAdmin(@PathVariable Long id) {
+        commentService.deleteCommentByAdmin(id);
         return ResponseEntity.ok(ApiResponse.success("评论删除成功"));
     }
 

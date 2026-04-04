@@ -67,7 +67,7 @@
       </form>
 
       <div class="footer">
-        已有账号？<router-link to="/login">立即登录</router-link>
+        已有账号？<router-link to="/auth/login">立即登录</router-link>
       </div>
     </div>
   </div>

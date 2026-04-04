@@ -4,7 +4,7 @@
       <h2>分类管理</h2>
       <el-button type="primary" @click="handleCreate">新建分类</el-button>
     </div>
-    <el-table :data="categories" stripe>
+    <el-table :data="categoryStore.categories" stripe v-loading="categoryStore.loading">
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" />
       <el-table-column prop="slug" label="Slug" />
@@ -37,42 +37,77 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useCategoryStore } from '@/stores/category'
+import type { CategoryRequest } from '@/api/types'
 
-const categories = ref([
-  { id: 1, name: '技术', slug: 'tech', description: '技术相关文章' },
-  { id: 2, name: '生活', slug: 'life', description: '生活分享' }
-])
+const categoryStore = useCategoryStore()
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新建分类')
-const form = ref({
-  id: null,
+const form = ref<CategoryRequest>({
   name: '',
   slug: '',
   description: ''
 })
+const editingId = ref<number | null>(null)
 
 const handleCreate = () => {
   dialogTitle.value = '新建分类'
-  form.value = { id: null, name: '', slug: '', description: '' }
+  form.value = { name: '', slug: '', description: '' }
+  editingId.value = null
   dialogVisible.value = true
 }
 
 const handleEdit = (row: any) => {
   dialogTitle.value = '编辑分类'
-  form.value = { ...row }
+  form.value = { name: row.name, slug: row.slug, description: row.description }
+  editingId.value = row.id
   dialogVisible.value = true
 }
 
-const handleDelete = (row: any) => {
-  console.log('delete', row)
+const handleDelete = async (row: any) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这个分类吗？', '提示', { type: 'warning' })
+    const res = await categoryStore.deleteCategory(row.id)
+    if (res.data.success) {
+      ElMessage.success('删除成功')
+    } else {
+      ElMessage.error(res.data.message || '删除失败')
+    }
+  } catch {
+    // 用户取消
+  }
 }
 
-const handleSave = () => {
-  console.log('save', form.value)
-  dialogVisible.value = false
+const handleSave = async () => {
+  if (!form.value.name || !form.value.slug) {
+    ElMessage.warning('请填写名称和 slug')
+    return
+  }
+  try {
+    let res
+    if (editingId.value) {
+      res = await categoryStore.updateCategory(editingId.value, form.value)
+    } else {
+      res = await categoryStore.createCategory(form.value)
+    }
+    if (res.data.success) {
+      ElMessage.success(editingId.value ? '更新成功' : '创建成功')
+      dialogVisible.value = false
+      categoryStore.fetchCategories()
+    } else {
+      ElMessage.error(res.data.message || '操作失败')
+    }
+  } catch {
+    ElMessage.error('操作失败')
+  }
 }
+
+onMounted(() => {
+  categoryStore.fetchCategories()
+})
 </script>
 
 <style scoped>

@@ -68,6 +68,19 @@ public class ArticleController {
     }
 
     /**
+     * 增加文章浏览量
+     * POST /api/articles/{id}/view
+     *
+     * @param id 文章ID
+     * @return 无内容返回
+     */
+    @PostMapping("/{id}/view")
+    public ResponseEntity<ApiResponse<Void>> incrementViewCount(@PathVariable Long id) {
+        articleService.incrementViewCount(id);
+        return ResponseEntity.ok(ApiResponse.success("浏览量已更新"));
+    }
+
+    /**
      * 分页查询文章列表
      * GET /api/articles?page=0&size=10
      *

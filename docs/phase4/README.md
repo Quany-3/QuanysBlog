@@ -20,11 +20,11 @@
 
 ## 进度
 
-- [ ] Task 1: 管理后台 - 文章管理 CRUD
-- [ ] Task 2: 管理后台 - 分类管理 CRUD
-- [ ] Task 3: 管理后台 - 标签管理 CRUD
-- [ ] Task 4: 管理后台 - 评论管理 CRUD
-- [ ] Task 5: 前台数据绑定完善
+- [x] Task 1: 管理后台 - 文章管理 CRUD
+- [x] Task 2: 管理后台 - 分类管理 CRUD
+- [x] Task 3: 管理后台 - 标签管理 CRUD
+- [x] Task 4: 管理后台 - 评论管理 CRUD
+- [x] Task 5: 前台数据绑定完善
 
 ---
 

@@ -13,6 +13,7 @@ import com.learnjava.quanysblog.module.user.entity.User;
 import com.learnjava.quanysblog.module.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -97,11 +98,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByArticle(Long articleId) {
-        // 获取文章的顶级评论（无父评论）
-        List<Comment> topLevelComments = commentRepository
-                .findByArticleIdAndParentIsNullAndStatusOrderByCreatedAtDesc(
-                        articleId, Comment.Status.APPROVED);
-
         // 获取所有评论
         List<Comment> allComments = commentRepository
                 .findByArticleIdAndStatusOrderByCreatedAtDesc(articleId, Comment.Status.APPROVED, Pageable.unpaged())
@@ -155,6 +151,36 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.delete(comment);
         log.info("删除评论成功：{}", id);
+    }
+
+    /**
+     * 获取所有评论（管理员用）
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CommentResponse> getAllComments(Pageable pageable) {
+        Page<Comment> comments = commentRepository.findByStatusOrderByCreatedAtDesc(Comment.Status.APPROVED, pageable);
+        return comments.map(this::toCommentResponse);
+    }
+
+    /**
+     * 管理员删除评论
+     */
+    @Override
+    @Transactional
+    public void deleteCommentByAdmin(Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.COMMENT_NOT_FOUND, "评论不存在"));
+
+        // 更新文章的评论计数
+        Article article = comment.getArticle();
+        if (article.getCommentCount() > 0) {
+            article.setCommentCount(article.getCommentCount() - 1);
+            articleRepository.save(article);
+        }
+
+        commentRepository.delete(comment);
+        log.info("管理员删除评论成功：{}", id);
     }
 
     /**

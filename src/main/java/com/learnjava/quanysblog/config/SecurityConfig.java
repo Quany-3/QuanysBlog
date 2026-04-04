@@ -61,7 +61,9 @@ public class SecurityConfig {
                 // 公开访问：标签查询接口（GET）
                 .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                 // 公开访问：评论查询接口（GET）
-                .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/comments/article/**").permitAll()
+                // 仅管理员访问：评论管理接口
+                .requestMatchers("/api/comments/admin/**").hasRole("ADMIN")
                 // 公开访问：搜索接口（GET）
                 .requestMatchers(HttpMethod.GET, "/api/search").permitAll()
                 // 仅管理员访问：后台管理接口

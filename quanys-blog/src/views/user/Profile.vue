@@ -37,13 +37,30 @@
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const form = ref({
-  username: 'Quany',
-  email: '1781070570@qq.com',
-  bio: '这是我的个人简介',
+  username: '',
+  email: '',
+  bio: '',
   avatar: ''
 })
+
+// 从 authStore 恢复用户信息
+const loadUserInfo = () => {
+  if (authStore.userInfo) {
+    form.value = {
+      username: authStore.userInfo.username,
+      email: authStore.userInfo.email || '',
+      bio: '',
+      avatar: authStore.userInfo.avatar || ''
+    }
+  }
+}
+
+loadUserInfo()
 
 const handleSave = () => {
   console.log('save', form.value)

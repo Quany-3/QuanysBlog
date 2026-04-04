@@ -17,6 +17,13 @@ export const articleApi = {
   },
 
   /**
+   * 增加文章浏览量
+   */
+  incrementViewCount(id: number) {
+    return api.post<ApiResponse<void>>(`/articles/${id}/view`)
+  },
+
+  /**
    * 创建文章
    */
   create(data: ArticleRequest) {

@@ -1,5 +1,5 @@
 import api from './index'
-import type { ApiResponse, CommentRequest, CommentResponse } from './types'
+import type { ApiResponse, CommentRequest, CommentResponse, PageResponse } from './types'
 
 export const commentApi = {
   /**
@@ -17,9 +17,23 @@ export const commentApi = {
   },
 
   /**
-   * 删除评论
+   * 删除评论（作者删除自己的）
    */
   delete(id: number) {
     return api.delete<ApiResponse<void>>(`/comments/${id}`)
+  },
+
+  /**
+   * 获取所有评论（管理员）
+   */
+  getAll(params?: { page?: number; size?: number }) {
+    return api.get<ApiResponse<PageResponse<CommentResponse>>>(`/comments/admin/all`, { params })
+  },
+
+  /**
+   * 管理员删除评论
+   */
+  deleteByAdmin(id: number) {
+    return api.delete<ApiResponse<void>>(`/comments/admin/${id}`)
   }
 }

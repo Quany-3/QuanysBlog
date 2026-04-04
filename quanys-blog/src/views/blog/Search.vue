@@ -13,15 +13,22 @@
       </el-input>
     </div>
     <div class="search-results">
-      <p class="result-count" v-if="hasSearched">找到约 {{ total }} 条结果</p>
-      <div class="article-list" v-if="hasSearched">
-        <el-card v-for="i in 5" :key="i" class="article-card" shadow="hover">
+      <p class="result-count" v-if="hasSearched">找到约 {{ articleStore.total }} 条结果</p>
+      <div v-loading="articleStore.loading" class="article-list">
+        <el-card
+          v-for="article in articleStore.articles"
+          :key="article.id"
+          class="article-card"
+          shadow="hover"
+          @click="goToArticle(article.id)"
+        >
           <template #header>
-            <span>搜索结果文章 {{ i }}</span>
+            <span>{{ article.title }}</span>
           </template>
-          <p>匹配的文章摘要内容...</p>
+          <p>{{ article.summary || article.content.slice(0, 100) + '...' }}</p>
         </el-card>
       </div>
+      <el-empty v-if="hasSearched && !articleStore.loading && articleStore.articles.length === 0" description="未找到相关文章" />
       <el-empty v-if="!hasSearched" description="输入关键词搜索文章" />
     </div>
   </div>
@@ -29,17 +36,25 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
+import { useArticleStore } from '@/stores/article'
+
+const router = useRouter()
+const articleStore = useArticleStore()
 
 const keyword = ref('')
 const hasSearched = ref(false)
-const total = ref(0)
 
 const handleSearch = () => {
   if (keyword.value.trim()) {
     hasSearched.value = true
-    total.value = Math.floor(Math.random() * 100)
+    articleStore.searchArticles(keyword.value)
   }
+}
+
+const goToArticle = (id: number) => {
+  router.push(`/article/${id}`)
 }
 </script>
 
@@ -59,6 +74,7 @@ const handleSearch = () => {
 }
 
 .article-list {
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   gap: 20px;

@@ -2,6 +2,8 @@ package com.learnjava.quanysblog.module.comment.service;
 
 import com.learnjava.quanysblog.module.comment.dto.request.CommentRequest;
 import com.learnjava.quanysblog.module.comment.dto.response.CommentResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -37,4 +39,19 @@ public interface CommentService {
      * @param authorId 当前用户ID（用于权限校验）
      */
     void deleteComment(Long id, Long authorId);
+
+    /**
+     * 获取所有评论（管理员用）
+     *
+     * @param pageable 分页参数
+     * @return 评论分页结果
+     */
+    Page<CommentResponse> getAllComments(Pageable pageable);
+
+    /**
+     * 管理员删除评论
+     *
+     * @param id 评论ID
+     */
+    void deleteCommentByAdmin(Long id);
 }

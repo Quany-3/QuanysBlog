@@ -68,14 +68,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Document, Folder, PriceTag, ChatDotRound } from '@element-plus/icons-vue'
+import { useArticleStore } from '@/stores/article'
+import { useCategoryStore } from '@/stores/category'
+import { useTagStore } from '@/stores/tag'
+import { useCommentStore } from '@/stores/comment'
 
-const stats = ref({
-  articles: 0,
-  categories: 0,
-  tags: 0,
-  comments: 0
+const articleStore = useArticleStore()
+const categoryStore = useCategoryStore()
+const tagStore = useTagStore()
+const commentStore = useCommentStore()
+
+const loading = ref(false)
+
+const loadStats = async () => {
+  loading.value = true
+  try {
+    await Promise.all([
+      articleStore.fetchArticles({ size: 1 }),
+      categoryStore.fetchCategories(),
+      tagStore.fetchTags(),
+      commentStore.fetchAllComments({ size: 1 })
+    ])
+  } finally {
+    loading.value = false
+  }
+}
+
+const stats = {
+  get articles() { return articleStore.total },
+  get categories() { return categoryStore.categories.length },
+  get tags() { return tagStore.tags.length },
+  get comments() { return commentStore.total }
+}
+
+onMounted(() => {
+  loadStats()
 })
 </script>
 

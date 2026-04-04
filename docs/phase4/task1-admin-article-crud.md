@@ -73,10 +73,10 @@
 
 ## 验证清单
 
-- [ ] ArticleList.vue 调用真实 API 获取文章列表
-- [ ] ArticleList.vue 支持分页
-- [ ] ArticleList.vue 删除功能调用 API
-- [ ] ArticleCreate.vue 表单提交调用 API
-- [ ] ArticleCreate.vue 获取真实分类和标签
-- [ ] ArticleEdit.vue 保存功能调用 API
-- [ ] 创建/编辑成功后刷新文章列表
+- [x] ArticleList.vue 调用真实 API 获取文章列表
+- [x] ArticleList.vue 支持分页
+- [x] ArticleList.vue 删除功能调用 API
+- [x] ArticleCreate.vue 表单提交调用 API
+- [x] ArticleCreate.vue 获取真实分类和标签
+- [x] ArticleEdit.vue 保存功能调用 API
+- [x] 创建/编辑成功后刷新文章列表
