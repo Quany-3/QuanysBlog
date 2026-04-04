@@ -46,4 +46,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return 是否存在
      */
     boolean existsByEmail(String email);
+
+    /**
+     *检查是否有管理员
+     *
+     */
+    boolean existsByRole(User.Role role);
 }

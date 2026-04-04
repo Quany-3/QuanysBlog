@@ -6,8 +6,8 @@ import type { ApiResponse, LoginRequest, RegisterRequest, AuthResponse } from '.
  * @param data 登录请求参数
  * @returns Promise
  */
-export function login(data: LoginRequest): Promise<ApiResponse<AuthResponse>> {
-  return api.post('/auth/login', data)
+export function login(data: LoginRequest) {
+  return api.post<ApiResponse<AuthResponse>>('/auth/login', data)
 }
 
 /**
@@ -15,6 +15,6 @@ export function login(data: LoginRequest): Promise<ApiResponse<AuthResponse>> {
  * @param data 注册请求参数
  * @returns Promise
  */
-export function register(data: RegisterRequest): Promise<ApiResponse<AuthResponse>> {
-  return api.post('/auth/register', data)
+export function register(data: RegisterRequest) {
+  return api.post<ApiResponse<AuthResponse>>('/auth/register', data)
 }

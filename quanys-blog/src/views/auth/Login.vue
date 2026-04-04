@@ -68,9 +68,9 @@ async function handleLogin() {
   try {
     const response = await login(formData.value)
     if (response.data.success) {
-      // 保存 token
-      authStore.setToken(response.data.data.token)
-      // 跳转到首页
+      const { token, username, email, role } = response.data.data
+      authStore.setToken(token)
+      authStore.setUserInfo({ id: 0, username, email, role })
       router.push('/')
     } else {
       errorMessage.value = response.data.message || '登录失败'

@@ -1,0 +1,60 @@
+import api from './index'
+import type { ApiResponse, ArticleRequest, ArticleResponse, PageResponse } from './types'
+
+export const articleApi = {
+  /**
+   * 分页获取文章列表
+   */
+  getList(params?: { page?: number; size?: number }) {
+    return api.get<ApiResponse<PageResponse<ArticleResponse>>>('/articles', { params })
+  },
+
+  /**
+   * 获取文章详情
+   */
+  getById(id: number) {
+    return api.get<ApiResponse<ArticleResponse>>(`/articles/${id}`)
+  },
+
+  /**
+   * 创建文章
+   */
+  create(data: ArticleRequest) {
+    return api.post<ApiResponse<ArticleResponse>>('/articles', data)
+  },
+
+  /**
+   * 更新文章
+   */
+  update(id: number, data: ArticleRequest) {
+    return api.put<ApiResponse<ArticleResponse>>(`/articles/${id}`, data)
+  },
+
+  /**
+   * 删除文章
+   */
+  delete(id: number) {
+    return api.delete<ApiResponse<void>>(`/articles/${id}`)
+  },
+
+  /**
+   * 按分类查询文章
+   */
+  getByCategory(categoryId: number, params?: { page?: number; size?: number }) {
+    return api.get<ApiResponse<PageResponse<ArticleResponse>>>(`/articles/category/${categoryId}`, { params })
+  },
+
+  /**
+   * 按标签查询文章
+   */
+  getByTag(tagId: number, params?: { page?: number; size?: number }) {
+    return api.get<ApiResponse<PageResponse<ArticleResponse>>>(`/articles/tag/${tagId}`, { params })
+  },
+
+  /**
+   * 搜索文章
+   */
+  search(keyword: string, params?: { page?: number; size?: number }) {
+    return api.get<ApiResponse<PageResponse<ArticleResponse>>>('/articles/search', { params: { q: keyword, ...params } })
+  }
+}

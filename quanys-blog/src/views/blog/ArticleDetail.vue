@@ -1,43 +1,69 @@
 <template>
   <div class="article-detail-page">
     <el-page-header @back="goBack" content="文章详情" />
-    <article class="article">
-      <header class="article-header">
-        <h1>文章标题</h1>
-        <div class="meta">
-          <span>作者：admin</span>
-          <span>发布时间：2024-01-01</span>
-          <span>浏览：100</span>
-        </div>
-        <div class="tags">
-          <el-tag>标签1</el-tag>
-          <el-tag>标签2</el-tag>
-        </div>
-      </header>
-      <div class="article-content">
-        <p>文章内容将在这里显示...</p>
-      </div>
-    </article>
-    <section class="comments">
-      <h3>评论</h3>
-      <el-empty description="暂无评论" />
-    </section>
+    <div v-loading="articleStore.loading" class="article-container">
+      <template v-if="articleStore.currentArticle">
+        <article class="article">
+          <header class="article-header">
+            <h1>{{ articleStore.currentArticle.title }}</h1>
+            <div class="meta">
+              <span>作者：{{ articleStore.currentArticle.authorUsername }}</span>
+              <span>发布时间：{{ articleStore.currentArticle.createdAt }}</span>
+              <span>浏览：{{ articleStore.currentArticle.viewCount }}</span>
+            </div>
+            <div class="tags">
+              <el-tag v-for="tag in articleStore.currentArticle.tags" :key="tag.id">
+                {{ tag.name }}
+              </el-tag>
+            </div>
+          </header>
+          <div class="article-content" v-html="renderedContent"></div>
+        </article>
+        <section class="comments">
+          <h3>评论</h3>
+          <el-empty description="暂无评论" />
+        </section>
+      </template>
+      <el-empty v-if="!articleStore.loading && !articleStore.currentArticle" description="文章不存在" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useArticleStore } from '@/stores/article'
+import { marked } from 'marked'
 
+const route = useRoute()
 const router = useRouter()
+const articleStore = useArticleStore()
+
+const articleId = computed(() => Number(route.params.id))
+
+const renderedContent = computed(() => {
+  if (!articleStore.currentArticle?.content) return ''
+  return marked(articleStore.currentArticle.content)
+})
 
 const goBack = () => {
   router.back()
 }
+
+onMounted(() => {
+  if (articleId.value) {
+    articleStore.fetchArticleById(articleId.value)
+  }
+})
 </script>
 
 <style scoped>
 .article-detail-page {
   padding: 20px 0;
+}
+
+.article-container {
+  min-height: 400px;
 }
 
 .article {

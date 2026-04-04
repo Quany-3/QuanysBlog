@@ -89,12 +89,12 @@
 
 ## 验证清单
 
-- [ ] `src/api/article.ts` API 方法完整
-- [ ] `src/api/category.ts` API 方法完整
-- [ ] `src/api/tag.ts` API 方法完整
-- [ ] `src/api/comment.ts` API 方法完整
-- [ ] Pinia Store 状态管理正常
-- [ ] 路由守卫权限控制正常
+- [x] `src/api/article.ts` API 方法完整
+- [x] `src/api/category.ts` API 方法完整
+- [x] `src/api/tag.ts` API 方法完整
+- [x] `src/api/comment.ts` API 方法完整
+- [x] Pinia Store 状态管理正常
+- [x] 路由守卫权限控制正常/co
 - [ ] 前后端联调测试通过
 
 ---

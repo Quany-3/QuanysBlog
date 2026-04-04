@@ -3,38 +3,72 @@
     <div class="page-header">
       <h1>欢迎来到 QuanysBlog</h1>
       <p>分享技术与生活</p>
+      <div v-if="authStore.isAdmin" class="admin-entry">
+        <el-button type="primary" @click="router.push('/admin')">进入管理后台</el-button>
+      </div>
     </div>
-    <div class="article-list">
-      <el-card v-for="i in 5" :key="i" class="article-card" shadow="hover">
+    <div v-loading="articleStore.loading" class="article-list">
+      <el-card
+        v-for="article in articleStore.articles"
+        :key="article.id"
+        class="article-card"
+        shadow="hover"
+        @click="goToArticle(article.id)"
+      >
         <template #header>
           <div class="card-header">
-            <span>文章标题 {{ i }}</span>
+            <span>{{ article.title }}</span>
           </div>
         </template>
-        <p>这里是文章摘要内容...</p>
+        <p>{{ article.summary || article.content.slice(0, 100) + '...' }}</p>
         <template #footer>
           <div class="card-footer">
-            <span>2024-01-01</span>
-            <span>作者</span>
+            <span>{{ article.authorUsername }}</span>
+            <span>{{ article.createdAt }}</span>
+            <span>{{ article.viewCount }} 浏览</span>
           </div>
         </template>
       </el-card>
+      <el-empty v-if="!articleStore.loading && articleStore.articles.length === 0" description="暂无文章" />
     </div>
-    <div class="pagination">
+    <div class="pagination" v-if="articleStore.total > 0">
       <el-pagination
         v-model:current-page="currentPage"
-        :page-size="10"
-        :total="100"
+        :page-size="articleStore.size"
+        :total="articleStore.total"
         layout="prev, pager, next"
+        @current-change="handlePageChange"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useArticleStore } from '@/stores/article'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
+const articleStore = useArticleStore()
+const authStore = useAuthStore()
 const currentPage = ref(1)
+
+const loadArticles = (page = 0) => {
+  articleStore.fetchArticles({ page, size: 10 })
+}
+
+const handlePageChange = (page: number) => {
+  loadArticles(page - 1)
+}
+
+const goToArticle = (id: number) => {
+  router.push(`/article/${id}`)
+}
+
+onMounted(() => {
+  loadArticles()
+})
 </script>
 
 <style scoped>
@@ -56,14 +90,17 @@ const currentPage = ref(1)
   color: #666;
 }
 
+.admin-entry {
+  margin-top: 20px;
+}
+
 .article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  min-height: 200px;
 }
 
 .article-card {
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .card-header {

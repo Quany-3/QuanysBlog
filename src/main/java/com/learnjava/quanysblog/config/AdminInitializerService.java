@@ -48,8 +48,8 @@ public class AdminInitializerService implements ApplicationRunner {
         }
 
         // 检查管理员是否已存在
-        if (userRepository.existsByUsername(adminUsername)) {
-            log.info("管理员账户已存在: {}", adminUsername);
+        if (userRepository.existsByRole(User.Role.ADMIN)) {
+            log.info("管理员账户已存在:");
             return;
         }
 

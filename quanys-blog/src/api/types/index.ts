@@ -9,6 +9,17 @@ export interface ApiResponse<T = any> {
 }
 
 /**
+ * 分页响应
+ */
+export interface PageResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+}
+
+/**
  * 用户角色
  */
 export const UserRole = {
@@ -54,4 +65,102 @@ export interface UserInfo {
   email: string
   avatar?: string
   role: string
+}
+
+// ============ Article Types ============
+
+export interface TagSimple {
+  id: number
+  name: string
+  slug: string
+  color?: string
+}
+
+export interface ArticleRequest {
+  title: string
+  content: string
+  summary?: string
+  coverImage?: string
+  categoryId?: number
+  tagIds?: number[]
+  isFeatured?: boolean
+  isPublished?: boolean
+}
+
+export interface ArticleResponse {
+  id: number
+  title: string
+  content: string
+  summary: string
+  coverImage: string
+  authorUsername: string
+  authorAvatar: string
+  categoryId: number
+  categoryName: string
+  tags: TagSimple[]
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  isFeatured: boolean
+  isPublished: boolean
+  publishedAt: string
+  createdAt: string
+  updatedAt: string
+}
+
+// ============ Category Types ============
+
+export interface CategoryRequest {
+  name: string
+  slug: string
+  description?: string
+  sort?: number
+}
+
+export interface CategoryResponse {
+  id: number
+  name: string
+  slug: string
+  description: string
+  sort: number
+  createdAt: string
+  updatedAt: string
+}
+
+// ============ Tag Types ============
+
+export interface TagRequest {
+  name: string
+  slug: string
+  color?: string
+}
+
+export interface TagResponse {
+  id: number
+  name: string
+  slug: string
+  color: string
+  createdAt: string
+}
+
+// ============ Comment Types ============
+
+export interface CommentRequest {
+  articleId: number
+  content: string
+  parentId?: number
+}
+
+export interface CommentResponse {
+  id: number
+  content: string
+  authorUsername: string
+  authorAvatar: string
+  articleId: number
+  articleTitle: string
+  parentId: number
+  children: CommentResponse[]
+  status: string
+  createdAt: string
+  updatedAt: string
 }

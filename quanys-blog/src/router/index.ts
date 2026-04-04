@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // 路由配置
 const routes: RouteRecordRaw[] = [
@@ -55,6 +56,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
         path: '',
@@ -98,13 +100,37 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('@/views/user/Profile.vue')
+    component: () => import('@/views/user/Profile.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore()
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next({ path: '/auth/login', query: { redirect: to.fullPath } })
+    return
+  }
+
+  if (to.meta.requiresAdmin) {
+    // 需要管理员权限：先确保已登录，再检查角色
+    if (!authStore.isLoggedIn) {
+      next({ path: '/auth/login', query: { redirect: to.fullPath } })
+      return
+    }
+    if (!authStore.isAdmin) {
+      next({ path: '/' })
+      return
+    }
+  }
+
+  next()
 })
 
 export default router
