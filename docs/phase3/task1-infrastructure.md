@@ -112,12 +112,12 @@
 
 ## 验证清单
 
-- [ ] Element Plus 及图标库安装成功
-- [ ] `vite.config.ts` 配置自动导入
-- [ ] `MainLayout.vue` 创建完成
-- [ ] `AdminLayout.vue` 创建完成
-- [ ] 嵌套路由配置正确
-- [ ] `npm run dev` 启动无报错
+- [x] Element Plus 及图标库安装成功
+- [x] `vite.config.ts` 配置自动导入
+- [x] `MainLayout.vue` 创建完成
+- [x] `AdminLayout.vue` 创建完成
+- [x] 嵌套路由配置正确
+- [x] `npm run build` 编译通过
 
 ---
 

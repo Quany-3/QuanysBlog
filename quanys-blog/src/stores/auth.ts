@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { UserInfo } from '@/api/types'
+import { UserRole, type UserInfo } from '@/api/types'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isLoggedIn = computed(() => !!token.value)
+  const isAdmin = computed(() => userInfo.value?.role === UserRole.ADMIN)
 
   // Actions
   function setToken(newToken: string) {
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     userInfo,
     isLoggedIn,
+    isAdmin,
     setToken,
     setUserInfo,
     logout

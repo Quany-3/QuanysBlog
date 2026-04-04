@@ -3,13 +3,13 @@ import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRespon
 import type { ApiResponse } from './types'
 
 // 创建 axios 实例
-const instance: AxiosInstance = axios.create({
+const instance = axios.create({
   baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
-})
+}) as AxiosInstance
 
 // 请求拦截器：添加 JWT Token
 instance.interceptors.request.use(
@@ -34,7 +34,7 @@ instance.interceptors.response.use(
     if (error.response) {
       // 服务器返回错误状态码
       const httpStatus = error.response.status
-      const { code, message } = error.response.data || {}
+      const { message } = error.response.data || {}
 
       // HTTP 401 表示认证失败（token 无效或过期）
       if (httpStatus === 401) {

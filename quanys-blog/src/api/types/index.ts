@@ -9,6 +9,16 @@ export interface ApiResponse<T = any> {
 }
 
 /**
+ * 用户角色
+ */
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  USER: 'USER'
+} as const
+
+export type UserRoleType = typeof UserRole[keyof typeof UserRole]
+
+/**
  * 登录请求
  */
 export interface LoginRequest {
