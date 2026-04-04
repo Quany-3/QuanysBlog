@@ -126,6 +126,6 @@ src/main/java/com/learnjava/quanysblog/
 
 - [x] `./mvnw compile` - 编译通过
 - [x] `./mvnw test` - 测试通过（1 passed）
-- [ ] 启动 MySQL: `docker compose up -d`
-- [ ] 启动后端: `./mvnw spring-boot:run`
-- [ ] API 测试
+- [x] 启动 MySQL: `docker compose up -d`
+- [x] 启动后端: `./mvnw spring-boot:run`
+- [x] API 测试
