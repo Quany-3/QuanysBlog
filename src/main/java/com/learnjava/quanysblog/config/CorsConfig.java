@@ -28,7 +28,7 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 允许的前端 origins（开发环境允许本地前端）
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:3000"));
 
         // 允许的 HTTP 方法
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

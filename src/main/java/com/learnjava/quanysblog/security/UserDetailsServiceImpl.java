@@ -1,7 +1,7 @@
 package com.learnjava.quanysblog.security;
 
-import com.learnjava.quanysblog.entity.User;
-import com.learnjava.quanysblog.repository.UserRepository;
+import com.learnjava.quanysblog.module.user.entity.User;
+import com.learnjava.quanysblog.module.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,0 +1,275 @@
+package com.learnjava.quanysblog.module.article.service.impl;
+
+import com.learnjava.quanysblog.common.exception.BusinessException;
+import com.learnjava.quanysblog.common.result.ResultCode;
+import com.learnjava.quanysblog.module.article.dto.request.ArticleRequest;
+import com.learnjava.quanysblog.module.article.dto.response.ArticleResponse;
+import com.learnjava.quanysblog.module.article.entity.Article;
+import com.learnjava.quanysblog.module.article.entity.Category;
+import com.learnjava.quanysblog.module.article.entity.Tag;
+import com.learnjava.quanysblog.module.article.repository.ArticleRepository;
+import com.learnjava.quanysblog.module.article.repository.CategoryRepository;
+import com.learnjava.quanysblog.module.article.repository.TagRepository;
+import com.learnjava.quanysblog.module.article.service.ArticleService;
+import com.learnjava.quanysblog.module.user.entity.User;
+import com.learnjava.quanysblog.module.auth.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * 文章服务实现类
+ * 处理文章相关的业务逻辑
+ *
+ * @author Quany
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ArticleServiceImpl implements ArticleService {
+
+    /**
+     * 文章数据访问层
+     */
+    private final ArticleRepository articleRepository;
+
+    /**
+     * 用户数据访问层
+     */
+    private final UserRepository userRepository;
+
+    /**
+     * 分类数据访问层
+     */
+    private final CategoryRepository categoryRepository;
+
+    /**
+     * 标签数据访问层
+     */
+    private final TagRepository tagRepository;
+
+    /**
+* 创建文章
+     */
+    @Override
+    @Transactional
+    public ArticleResponse createArticle(ArticleRequest request, Long authorId) {
+        // 获取作者
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new BusinessException(ResultCode.USER_NOT_FOUND, "用户不存在"));
+
+        // 获取分类（如果指定）
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(ResultCode.CATEGORY_NOT_FOUND, "分类不存在"));
+        }
+
+        // 获取标签
+        Set<Tag> tags = new HashSet<>();
+        if (request.getTagIds() != null && !request.getTagIds().isEmpty()) {
+            tags = new HashSet<>(tagRepository.findAllById(request.getTagIds()));
+        }
+
+        // 构建文章实体
+        Article article = Article.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .summary(request.getSummary())
+                .coverImage(request.getCoverImage())
+                .author(author)
+                .category(category)
+                .tags(tags)
+                .isFeatured(request.getIsFeatured() != null ? request.getIsFeatured() : false)
+                .isPublished(request.getIsPublished() != null ? request.getIsPublished() : true)
+                .publishedAt(request.getIsPublished() != null && request.getIsPublished() ? LocalDateTime.now() : null)
+                .viewCount(0)
+                .likeCount(0)
+                .commentCount(0)
+                .build();
+
+        article = articleRepository.save(article);
+        log.info("创建文章成功：{}，作者：{}", article.getId(), author.getUsername());
+
+        return toArticleResponse(article);
+    }
+
+    /**
+     * 更新文章
+     */
+    @Override
+    @Transactional
+    public ArticleResponse updateArticle(Long id, ArticleRequest request, Long authorId) {
+        // 获取文章
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+
+        // 校验权限：只有作者才能修改
+        if (!article.getAuthor().getId().equals(authorId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "没有权限修改此文章");
+        }
+
+        // 更新分类（如果指定）
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(ResultCode.CATEGORY_NOT_FOUND, "分类不存在"));
+            article.setCategory(category);
+        }
+
+        // 更新标签
+        if (request.getTagIds() != null) {
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(request.getTagIds()));
+            article.setTags(tags);
+        }
+
+        // 更新其他字段
+        article.setTitle(request.getTitle());
+        article.setContent(request.getContent());
+        article.setSummary(request.getSummary());
+        article.setCoverImage(request.getCoverImage());
+
+        if (request.getIsFeatured() != null) {
+            article.setIsFeatured(request.getIsFeatured());
+        }
+
+        // 处理发布状态变更
+        if (request.getIsPublished() != null && request.getIsPublished()) {
+            if (article.getPublishedAt() == null) {
+                article.setPublishedAt(LocalDateTime.now());
+            }
+            article.setIsPublished(true);
+        } else if (request.getIsPublished() != null) {
+            article.setIsPublished(false);
+        }
+
+        article = articleRepository.save(article);
+        log.info("更新文章成功：{}", article.getId());
+
+        return toArticleResponse(article);
+    }
+
+    /**
+     * 删除文章
+     */
+    @Override
+    @Transactional
+    public void deleteArticle(Long id, Long authorId) {
+        // 获取文章
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+
+        // 校验权限：只有作者才能删除
+        if (!article.getAuthor().getId().equals(authorId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "没有权限删除此文章");
+        }
+
+        articleRepository.delete(article);
+        log.info("删除文章成功：{}", id);
+    }
+
+    /**
+     * 获取文章详情
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ArticleResponse getArticleById(Long id) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+        return toArticleResponse(article);
+    }
+
+    /**
+     * 分页查询文章列表
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ArticleResponse> getArticlesByPage(Pageable pageable) {
+        Page<Article> articles = articleRepository.findByIsPublishedTrueOrderByPublishedAtDesc(pageable);
+        return articles.map(this::toArticleResponse);
+    }
+
+    /**
+     * 按分类查询文章
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ArticleResponse> getArticlesByCategory(Long categoryId, Pageable pageable) {
+        // 校验分类是否存在
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new BusinessException(ResultCode.CATEGORY_NOT_FOUND, "分类不存在");
+        }
+        Page<Article> articles = articleRepository.findByCategoryIdAndIsPublishedTrueOrderByPublishedAtDesc(categoryId, pageable);
+        return articles.map(this::toArticleResponse);
+    }
+
+    /**
+     * 按标签查询文章
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ArticleResponse> getArticlesByTag(Long tagId, Pageable pageable) {
+        // 校验标签是否存在
+        if (!tagRepository.existsById(tagId)) {
+            throw new BusinessException(ResultCode.TAG_NOT_FOUND, "标签不存在");
+        }
+        Page<Article> articles = articleRepository.findByTagIdAndIsPublishedTrue(tagId, pageable);
+        return articles.map(this::toArticleResponse);
+    }
+
+    /**
+     * 搜索文章
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ArticleResponse> searchArticles(String keyword, Pageable pageable) {
+        Page<Article> articles = articleRepository.searchByKeyword(keyword, pageable);
+        return articles.map(this::toArticleResponse);
+    }
+
+    /**
+     * 将 Article 实体转换为 ArticleResponse DTO
+     */
+    private ArticleResponse toArticleResponse(Article article) {
+        // 构建标签响应列表
+        Set<ArticleResponse.TagResponse> tagResponses = null;
+        if (article.getTags() != null && !article.getTags().isEmpty()) {
+            tagResponses = article.getTags().stream()
+                    .map(tag -> ArticleResponse.TagResponse.builder()
+                            .id(tag.getId())
+                            .name(tag.getName())
+                            .slug(tag.getSlug())
+                            .color(tag.getColor())
+                            .build())
+                    .collect(Collectors.toSet());
+        }
+
+        return ArticleResponse.builder()
+                .id(article.getId())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .summary(article.getSummary())
+                .coverImage(article.getCoverImage())
+                .authorUsername(article.getAuthor().getUsername())
+                .authorAvatar(article.getAuthor().getAvatar())
+                .categoryId(article.getCategory() != null ? article.getCategory().getId() : null)
+                .categoryName(article.getCategory() != null ? article.getCategory().getName() : null)
+                .tags(tagResponses)
+                .viewCount(article.getViewCount())
+                .likeCount(article.getLikeCount())
+                .commentCount(article.getCommentCount())
+                .isFeatured(article.getIsFeatured())
+                .isPublished(article.getIsPublished())
+                .publishedAt(article.getPublishedAt())
+                .createdAt(article.getCreatedAt())
+                .updatedAt(article.getUpdatedAt())
+                .build();
+    }
+}

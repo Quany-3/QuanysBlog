@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/86199/Desktop/learnJava/QuanysBlog/**)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(docker compose:*)",
+      "Bash(netstat -ano)",
+      "Bash(npm install:*)",
+      "Bash(taskkill //F //PID 79388)",
+      "Bash(npm run:*)",
+      "Bash(taskkill //F //PID 86676)"
+    ]
+  }
+}

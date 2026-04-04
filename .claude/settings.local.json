@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\QuanysBlog\\\\src\\\\main\\\\java\\\\com\\\\learnjava\\\\quanysblog\\\\common\\\\result\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\QuanysBlog\\\\src\\\\main\\\\java\\\\com\\\\learnjava\\\\quanysblog\\\\common\\\\exception\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\quanys-blog\\\\src\\\\api\\\\types\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\quanys-blog\\\\src\\\\views\\\\auth\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\quanys-blog\\\\src\\\\router\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\quanys-blog\\\\src\\\\stores\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\86199\\\\Desktop\\\\learnJava\\\\quanys-blog\\\\src\\\\assets\")"
+    ]
+  }
+}
