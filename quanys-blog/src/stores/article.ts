@@ -17,9 +17,9 @@ export const useArticleStore = defineStore('article', () => {
       const res = await articleApi.getList(params)
       if (res.data.success) {
         articles.value = res.data.data.content
-        total.value = res.data.data.totalElements
-        page.value = res.data.data.number
-        size.value = res.data.data.size
+        total.value = res.data.data.page.totalElements
+        page.value = res.data.data.page.number
+        size.value = res.data.data.page.size
       }
     } finally {
       loading.value = false
@@ -44,9 +44,9 @@ export const useArticleStore = defineStore('article', () => {
       const res = await articleApi.getByCategory(categoryId, params)
       if (res.data.success) {
         articles.value = res.data.data.content
-        total.value = res.data.data.totalElements
-        page.value = res.data.data.number
-        size.value = res.data.data.size
+        total.value = res.data.data.page.totalElements
+        page.value = res.data.data.page.number
+        size.value = res.data.data.page.size
       }
     } finally {
       loading.value = false
@@ -59,9 +59,9 @@ export const useArticleStore = defineStore('article', () => {
       const res = await articleApi.getByTag(tagId, params)
       if (res.data.success) {
         articles.value = res.data.data.content
-        total.value = res.data.data.totalElements
-        page.value = res.data.data.number
-        size.value = res.data.data.size
+        total.value = res.data.data.page.totalElements
+        page.value = res.data.data.page.number
+        size.value = res.data.data.page.size
       }
     } finally {
       loading.value = false
@@ -74,9 +74,9 @@ export const useArticleStore = defineStore('article', () => {
       const res = await articleApi.search(keyword, params)
       if (res.data.success) {
         articles.value = res.data.data.content
-        total.value = res.data.data.totalElements
-        page.value = res.data.data.number
-        size.value = res.data.data.size
+        total.value = res.data.data.page.totalElements
+        page.value = res.data.data.page.number
+        size.value = res.data.data.page.size
       }
     } finally {
       loading.value = false

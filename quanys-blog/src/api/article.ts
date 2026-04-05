@@ -1,5 +1,5 @@
 import api from './index'
-import type { ApiResponse, ArticleRequest, ArticleResponse, PageResponse } from './types'
+import type { ApiResponse, ArticleRequest, ArticleResponse, LikeResponse, PageResponse } from './types'
 
 export const articleApi = {
   /**
@@ -21,6 +21,27 @@ export const articleApi = {
    */
   incrementViewCount(id: number) {
     return api.post<ApiResponse<void>>(`/articles/${id}/view`)
+  },
+
+  /**
+   * 点赞文章
+   */
+  likeArticle(id: number) {
+    return api.post<ApiResponse<LikeResponse>>(`/articles/${id}/like`)
+  },
+
+  /**
+   * 取消点赞文章
+   */
+  unlikeArticle(id: number) {
+    return api.delete<ApiResponse<LikeResponse>>(`/articles/${id}/like`)
+  },
+
+  /**
+   * 获取点赞状态
+   */
+  getLikeStatus(id: number) {
+    return api.get<ApiResponse<LikeResponse>>(`/articles/${id}/like/status`)
   },
 
   /**

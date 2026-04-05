@@ -68,9 +68,9 @@ async function handleLogin() {
   try {
     const response = await login(formData.value)
     if (response.data.success) {
-      const { token, username, email, role } = response.data.data
+      const { token, username, email, role, avatar } = response.data.data
       authStore.setToken(token)
-      authStore.setUserInfo({ id: 0, username, email, role })
+      authStore.setUserInfo({ id: 0, username, email, role, avatar })
       router.push('/')
     } else {
       errorMessage.value = response.data.message || '登录失败'

@@ -74,4 +74,13 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
      */
     @Query("SELECT a FROM Article a WHERE a.isPublished = true AND (a.title LIKE %:keyword% OR a.content LIKE %:keyword%) ORDER BY a.publishedAt DESC")
     Page<Article> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * 仅查询文章的点赞数
+     *
+     * @param id 文章ID
+     * @return 点赞数
+     */
+    @Query("SELECT a.likeCount FROM Article a WHERE a.id = :id")
+    Integer getLikeCountById(@Param("id") Long id);
 }

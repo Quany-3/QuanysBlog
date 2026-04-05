@@ -2,6 +2,7 @@ package com.learnjava.quanysblog.module.article.service;
 
 import com.learnjava.quanysblog.module.article.dto.request.ArticleRequest;
 import com.learnjava.quanysblog.module.article.dto.response.ArticleResponse;
+import com.learnjava.quanysblog.module.article.dto.response.LikeResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -89,4 +90,40 @@ public interface ArticleService {
      * @param id 文章ID
      */
     void incrementViewCount(Long id);
+
+    /**
+     * 点赞文章
+     *
+     * @param articleId 文章ID
+     * @param userId 用户ID
+     * @return 点赞结果
+     */
+    LikeResponse likeArticle(Long articleId, Long userId);
+
+    /**
+     * 取消点赞文章
+     *
+     * @param articleId 文章ID
+     * @param userId 用户ID
+     * @return 取消点赞结果
+     */
+    LikeResponse unlikeArticle(Long articleId, Long userId);
+
+    /**
+     * 检查用户是否点赞了文章
+     *
+     * @param articleId 文章ID
+     * @param userId 用户ID
+     * @return 是否点赞
+     */
+    boolean hasLiked(Long articleId, Long userId);
+
+    /**
+     * 获取点赞状态
+     *
+     * @param articleId 文章ID
+     * @param userId 用户ID
+     * @return 点赞状态和点赞数
+     */
+    LikeResponse getLikeStatus(Long articleId, Long userId);
 }

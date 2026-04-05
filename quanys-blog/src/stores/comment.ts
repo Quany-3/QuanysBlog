@@ -26,7 +26,7 @@ export const useCommentStore = defineStore('comment', () => {
       const res = await commentApi.getAll(params)
       if (res.data.success) {
         comments.value = res.data.data.content
-        total.value = res.data.data.totalElements
+        total.value = res.data.data.page.totalElements
       }
     } finally {
       loading.value = false

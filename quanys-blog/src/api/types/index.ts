@@ -9,14 +9,16 @@ export interface ApiResponse<T = any> {
 }
 
 /**
- * 分页响应
+ * 分页响应（Spring Data Page 格式）
  */
 export interface PageResponse<T> {
   content: T[]
-  totalElements: number
-  totalPages: number
-  size: number
-  number: number
+  page: {
+    size: number
+    number: number
+    totalElements: number
+    totalPages: number
+  }
 }
 
 /**
@@ -108,6 +110,14 @@ export interface ArticleResponse {
   publishedAt: string
   createdAt: string
   updatedAt: string
+  liked?: boolean
+}
+
+// ============ Like Types ============
+
+export interface LikeResponse {
+  liked: boolean
+  likeCount: number
 }
 
 // ============ Category Types ============

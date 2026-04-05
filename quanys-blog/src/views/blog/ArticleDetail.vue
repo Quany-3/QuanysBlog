@@ -7,9 +7,18 @@
           <header class="article-header">
             <h1>{{ articleStore.currentArticle.title }}</h1>
             <div class="meta">
-              <span>作者：{{ articleStore.currentArticle.authorUsername }}</span>
-              <span>发布时间：{{ articleStore.currentArticle.createdAt }}</span>
-              <span>浏览：{{ articleStore.currentArticle.viewCount }}</span>
+              <span><el-icon><User /></el-icon> {{ articleStore.currentArticle.authorUsername }}</span>
+              <span class="separator">|</span>
+              <span><el-icon><Clock /></el-icon> {{ articleStore.currentArticle.createdAt }}</span>
+              <span class="separator">|</span>
+              <span><el-icon><View /></el-icon> {{ articleStore.currentArticle.viewCount }}</span>
+              <span class="separator">|</span>
+              <span class="like-wrapper">
+                <el-button :type="liked ? 'primary' : 'default'" text @click="handleLike" :loading="likeLoading">
+                  <el-icon><Star /></el-icon>
+                  {{ articleStore.currentArticle.likeCount }}
+                </el-button>
+              </span>
             </div>
             <div class="tags">
               <el-tag v-for="tag in articleStore.currentArticle.tags" :key="tag.id">
@@ -73,6 +82,7 @@ import { useAuthStore } from '@/stores/auth'
 import { marked } from 'marked'
 import { ElMessage } from 'element-plus'
 import { articleApi } from '@/api/article'
+import { Star, User, Clock, View } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -82,6 +92,8 @@ const authStore = useAuthStore()
 
 const articleId = computed(() => Number(route.params.id))
 const commentContent = ref('')
+const liked = ref(false)
+const likeLoading = ref(false)
 
 // 浏览量限制：30分钟内同文章只计一次
 const VIEW_COUNT_KEY = 'article_viewed'
@@ -108,6 +120,40 @@ const renderedContent = computed(() => {
 
 const goBack = () => {
   router.back()
+}
+
+const handleLike = async () => {
+  if (!authStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push('/auth/login')
+    return
+  }
+
+  likeLoading.value = true
+  try {
+    const api = liked.value ? articleApi.unlikeArticle : articleApi.likeArticle
+    const res = await api(articleId.value)
+    if (res.data.success && articleStore.currentArticle) {
+      articleStore.currentArticle.likeCount = res.data.data.likeCount
+      liked.value = res.data.data.liked
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || '操作失败')
+  } finally {
+    likeLoading.value = false
+  }
+}
+
+const loadLikeStatus = async () => {
+  if (!authStore.isLoggedIn) return
+  try {
+    const res = await articleApi.getLikeStatus(articleId.value)
+    if (res.data.success) {
+      liked.value = res.data.data.liked
+    }
+  } catch {
+    // ignore
+  }
 }
 
 const handleSubmitComment = async () => {
@@ -148,6 +194,9 @@ onMounted(async () => {
       await articleApi.incrementViewCount(articleId.value)
       recordViewCount(articleId.value)
     }
+
+    // 获取点赞状态
+    loadLikeStatus()
   }
 })
 </script>
@@ -181,10 +230,24 @@ onMounted(async () => {
 
 .meta {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 8px;
   color: #999;
   font-size: 14px;
   margin-bottom: 15px;
+}
+
+.meta .separator {
+  color: #ddd;
+}
+
+.meta .el-icon {
+  margin-right: 2px;
+}
+
+.like-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .tags {

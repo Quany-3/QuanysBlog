@@ -7,7 +7,7 @@
           <div class="stat-card">
             <div class="stat-icon"><Document /></div>
             <div class="stat-info">
-              <p class="stat-value">{{ stats.articles }}</p>
+              <p class="stat-value">{{ articleStore.total || 0 }}</p>
               <p class="stat-label">文章数</p>
             </div>
           </div>
@@ -18,7 +18,7 @@
           <div class="stat-card">
             <div class="stat-icon"><Folder /></div>
             <div class="stat-info">
-              <p class="stat-value">{{ stats.categories }}</p>
+              <p class="stat-value">{{ categoryStore.categories.length }}</p>
               <p class="stat-label">分类数</p>
             </div>
           </div>
@@ -29,7 +29,7 @@
           <div class="stat-card">
             <div class="stat-icon"><PriceTag /></div>
             <div class="stat-info">
-              <p class="stat-value">{{ stats.tags }}</p>
+              <p class="stat-value">{{ tagStore.tags.length }}</p>
               <p class="stat-label">标签数</p>
             </div>
           </div>
@@ -40,7 +40,7 @@
           <div class="stat-card">
             <div class="stat-icon"><ChatDotRound /></div>
             <div class="stat-info">
-              <p class="stat-value">{{ stats.comments }}</p>
+              <p class="stat-value">{{ commentStore.total || 0 }}</p>
               <p class="stat-label">评论数</p>
             </div>
           </div>
@@ -86,21 +86,14 @@ const loadStats = async () => {
   loading.value = true
   try {
     await Promise.all([
-      articleStore.fetchArticles({ size: 1 }),
+      articleStore.fetchArticles({ page: 0, size: 1 }),
       categoryStore.fetchCategories(),
       tagStore.fetchTags(),
-      commentStore.fetchAllComments({ size: 1 })
+      commentStore.fetchAllComments({ page: 0, size: 1 })
     ])
   } finally {
     loading.value = false
   }
-}
-
-const stats = {
-  get articles() { return articleStore.total },
-  get categories() { return categoryStore.categories.length },
-  get tags() { return tagStore.tags.length },
-  get comments() { return commentStore.total }
 }
 
 onMounted(() => {

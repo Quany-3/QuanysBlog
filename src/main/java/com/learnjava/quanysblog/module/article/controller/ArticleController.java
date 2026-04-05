@@ -3,6 +3,7 @@ package com.learnjava.quanysblog.module.article.controller;
 import com.learnjava.quanysblog.common.result.ApiResponse;
 import com.learnjava.quanysblog.module.article.dto.request.ArticleRequest;
 import com.learnjava.quanysblog.module.article.dto.response.ArticleResponse;
+import com.learnjava.quanysblog.module.article.dto.response.LikeResponse;
 import com.learnjava.quanysblog.module.article.service.ArticleService;
 import com.learnjava.quanysblog.module.user.entity.User;
 import com.learnjava.quanysblog.module.auth.repository.UserRepository;
@@ -78,6 +79,57 @@ public class ArticleController {
     public ResponseEntity<ApiResponse<Void>> incrementViewCount(@PathVariable Long id) {
         articleService.incrementViewCount(id);
         return ResponseEntity.ok(ApiResponse.success("浏览量已更新"));
+    }
+
+    /**
+     * 点赞文章
+     * POST /api/articles/{id}/like
+     *
+     * @param id 文章ID
+     * @param authentication 当前登录用户
+     * @return 点赞结果
+     */
+    @PostMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<LikeResponse>> likeArticle(
+            @PathVariable Long id,
+            Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
+        LikeResponse response = articleService.likeArticle(id, userId);
+        return ResponseEntity.ok(ApiResponse.success("点赞成功", response));
+    }
+
+    /**
+     * 取消点赞文章
+     * DELETE /api/articles/{id}/like
+     *
+     * @param id 文章ID
+     * @param authentication 当前登录用户
+     * @return 取消点赞结果
+     */
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<LikeResponse>> unlikeArticle(
+            @PathVariable Long id,
+            Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
+        LikeResponse response = articleService.unlikeArticle(id, userId);
+        return ResponseEntity.ok(ApiResponse.success("取消点赞成功", response));
+    }
+
+    /**
+     * 查询点赞状态
+     * GET /api/articles/{id}/like/status
+     *
+     * @param id 文章ID
+     * @param authentication 当前登录用户
+     * @return 点赞状态
+     */
+    @GetMapping("/{id}/like/status")
+    public ResponseEntity<ApiResponse<LikeResponse>> getLikeStatus(
+            @PathVariable Long id,
+            Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
+        LikeResponse response = articleService.getLikeStatus(id, userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     /**

@@ -21,11 +21,20 @@
           </div>
         </template>
         <p>{{ article.summary || article.content.slice(0, 100) + '...' }}</p>
+        <div v-if="article.tags && article.tags.length" class="article-tags">
+          <el-tag v-for="tag in article.tags.slice(0, 3)" :key="tag.id" size="small">
+            {{ tag.name }}
+          </el-tag>
+        </div>
         <template #footer>
           <div class="card-footer">
-            <span>{{ article.authorUsername }}</span>
-            <span>{{ article.createdAt }}</span>
-            <span>{{ article.viewCount }} 浏览</span>
+            <span><el-icon><User /></el-icon> {{ article.authorUsername }}</span>
+            <span class="separator">|</span>
+            <span><el-icon><Clock /></el-icon> {{ article.createdAt }}</span>
+            <div class="stats">
+              <span><el-icon><View /></el-icon> {{ article.viewCount }}</span>
+              <span><el-icon><Star /></el-icon> {{ article.likeCount }}</span>
+            </div>
           </div>
         </template>
       </el-card>
@@ -48,6 +57,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useArticleStore } from '@/stores/article'
 import { useAuthStore } from '@/stores/auth'
+import { User, Clock, View, Star } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const articleStore = useArticleStore()
@@ -109,9 +119,31 @@ onMounted(() => {
 
 .card-footer {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
   color: #999;
   font-size: 14px;
+}
+
+.card-footer .separator {
+  color: #ddd;
+}
+
+.card-footer .el-icon {
+  margin-right: 2px;
+}
+
+.stats {
+  margin-left: auto;
+  display: flex;
+  gap: 15px;
+}
+
+.article-tags {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .pagination {

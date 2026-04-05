@@ -4,9 +4,12 @@ import com.learnjava.quanysblog.common.exception.BusinessException;
 import com.learnjava.quanysblog.common.result.ResultCode;
 import com.learnjava.quanysblog.module.article.dto.request.ArticleRequest;
 import com.learnjava.quanysblog.module.article.dto.response.ArticleResponse;
+import com.learnjava.quanysblog.module.article.dto.response.LikeResponse;
 import com.learnjava.quanysblog.module.article.entity.Article;
+import com.learnjava.quanysblog.module.article.entity.ArticleLike;
 import com.learnjava.quanysblog.module.article.entity.Category;
 import com.learnjava.quanysblog.module.article.entity.Tag;
+import com.learnjava.quanysblog.module.article.repository.ArticleLikeRepository;
 import com.learnjava.quanysblog.module.article.repository.ArticleRepository;
 import com.learnjava.quanysblog.module.article.repository.CategoryRepository;
 import com.learnjava.quanysblog.module.article.repository.TagRepository;
@@ -40,6 +43,11 @@ public class ArticleServiceImpl implements ArticleService {
      * 文章数据访问层
      */
     private final ArticleRepository articleRepository;
+
+    /**
+     * 点赞数据访问层
+     */
+    private final ArticleLikeRepository articleLikeRepository;
 
     /**
      * 用户数据访问层
@@ -196,6 +204,94 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
         article.setViewCount(article.getViewCount() + 1);
         articleRepository.save(article);
+    }
+
+    /**
+     * 点赞文章
+     */
+    @Override
+    @Transactional
+    public LikeResponse likeArticle(Long articleId, Long userId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+
+        // 检查是否已点赞
+        if (articleLikeRepository.existsByUserIdAndArticleId(userId, articleId)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "已经点赞过了");
+        }
+
+        // 使用代理对象，避免查询用户表
+        User userRef = User.builder().id(userId).build();
+
+        // 创建点赞记录
+        ArticleLike like = ArticleLike.builder()
+                .user(userRef)
+                .article(article)
+                .build();
+        articleLikeRepository.save(like);
+
+        // 更新点赞数
+        article.setLikeCount(article.getLikeCount() + 1);
+        articleRepository.save(article);
+
+        log.info("用户 {} 点赞了文章 {}", userId, articleId);
+
+        return LikeResponse.builder()
+                .liked(true)
+                .likeCount(article.getLikeCount())
+                .build();
+    }
+
+    /**
+     * 取消点赞文章
+     */
+    @Override
+    @Transactional
+    public LikeResponse unlikeArticle(Long articleId, Long userId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessException(ResultCode.ARTICLE_NOT_FOUND, "文章不存在"));
+
+        // 检查是否已点赞
+        if (!articleLikeRepository.existsByUserIdAndArticleId(userId, articleId)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "还没有点赞");
+        }
+
+        // 删除点赞记录
+        articleLikeRepository.deleteByUserIdAndArticleId(userId, articleId);
+
+        // 更新点赞数
+        article.setLikeCount(Math.max(0, article.getLikeCount() - 1));
+        articleRepository.save(article);
+
+        log.info("用户取消点赞了文章 {}", articleId);
+
+        return LikeResponse.builder()
+                .liked(false)
+                .likeCount(article.getLikeCount())
+                .build();
+    }
+
+    /**
+     * 检查用户是否点赞了文章
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasLiked(Long articleId, Long userId) {
+        return articleLikeRepository.existsByUserIdAndArticleId(userId, articleId);
+    }
+
+    /**
+     * 获取点赞状态
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public LikeResponse getLikeStatus(Long articleId, Long userId) {
+        Integer likeCount = articleRepository.getLikeCountById(articleId);
+        boolean liked = articleLikeRepository.existsByUserIdAndArticleId(userId, articleId);
+        return LikeResponse.builder()
+                .liked(liked)
+                .likeCount(likeCount != null ? likeCount : 0)
+                .build();
     }
 
     /**
