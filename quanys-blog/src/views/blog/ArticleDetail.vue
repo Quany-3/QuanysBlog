@@ -38,6 +38,8 @@
             </div>
             <div v-else v-for="comment in commentStore.comments" :key="comment.id" class="comment-item">
               <div class="comment-header">
+                <img v-if="comment.authorAvatar" :src="comment.authorAvatar" class="comment-avatar" />
+                <img v-else src="@/assets/default-avatar.svg" class="comment-avatar" />
                 <span class="comment-author">{{ comment.authorUsername }}</span>
                 <span class="comment-time">{{ comment.createdAt }}</span>
               </div>
@@ -45,6 +47,8 @@
               <div v-if="comment.children && comment.children.length > 0" class="comment-children">
                 <div v-for="child in comment.children" :key="child.id" class="comment-item child">
                   <div class="comment-header">
+                    <img v-if="child.authorAvatar" :src="child.authorAvatar" class="comment-avatar" />
+                    <img v-else src="@/assets/default-avatar.svg" class="comment-avatar" />
                     <span class="comment-author">{{ child.authorUsername }}</span>
                     <span class="comment-time">{{ child.createdAt }}</span>
                   </div>
@@ -243,8 +247,16 @@ onMounted(async () => {
 
 .comment-header {
   display: flex;
+  align-items: center;
   gap: 15px;
   margin-bottom: 8px;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .comment-author {

@@ -54,6 +54,7 @@ export interface AuthResponse {
   username: string
   email: string
   role: string
+  avatar?: string
 }
 
 /**
@@ -64,6 +65,7 @@ export interface UserInfo {
   username: string
   email: string
   avatar?: string
+  bio?: string
   role: string
 }
 

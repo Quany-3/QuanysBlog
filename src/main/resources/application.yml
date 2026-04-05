@@ -11,7 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -34,6 +34,17 @@ logging:
     com.learnjava.quanysblog: debug
     org.springframework.security: debug
 
-ADMIN_USERNAME: yourname 
-ADMIN_PASSWORD: yourpw
-ADMIN_EMAIL: youremail
+# Admin 初始化配置
+ADMIN_USERNAME: ${ADMIN_USERNAME:admin}
+ADMIN_PASSWORD: ${ADMIN_PASSWORD:admin123}
+ADMIN_EMAIL: ${ADMIN_EMAIL:admin@example.com}
+
+# MinIO 对象存储配置
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:quanysblog}
+  public-url: ${MINIO_PUBLIC_URL:http://localhost:9000/quanysblog}
+  avatar-max-size: 2097152
+  avatar-allowed-types: image/jpeg,image/png,image/gif,image/webp

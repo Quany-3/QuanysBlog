@@ -31,6 +31,13 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(USER_INFO_KEY)
   }
 
+  function updateUserInfo(partial: Partial<UserInfo>) {
+    if (userInfo.value) {
+      userInfo.value = { ...userInfo.value, ...partial }
+      localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo.value))
+    }
+  }
+
   return {
     token,
     userInfo,
@@ -38,6 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     setToken,
     setUserInfo,
+    updateUserInfo,
     logout
   }
 })

@@ -54,6 +54,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 公开访问：认证相关接口（注册、登录）
                 .requestMatchers("/api/auth/**").permitAll()
+                // 用户资料接口需要认证
+                .requestMatchers("/api/user/**").authenticated()
                 // 公开访问：文章查询接口（GET）
                 .requestMatchers(HttpMethod.GET, "/api/articles/**").permitAll()
                 // 公开访问：分类查询接口（GET）

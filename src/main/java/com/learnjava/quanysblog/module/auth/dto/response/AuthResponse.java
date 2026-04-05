@@ -37,4 +37,9 @@ public class AuthResponse {
      * 用户角色
      */
     private String role;
+
+    /**
+     * 用户头像 URL
+     */
+    private String avatar;
 }
